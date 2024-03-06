@@ -11,9 +11,11 @@ def extract_audio():
     ffmpeg.run(stream, overwrite_output=True)
     return extracted_audio
 
-def run():
+def main():
     extracted_audio = extract_audio()
     model = whisper.load_model("base.en")
     result = model.transcribe(extracted_audio)
     print(result["text"])
-run()
+
+if __name__ == "__main__":
+    main()
