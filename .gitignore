@@ -4,5 +4,5 @@ venv
 
 .env
 
-input.mp4
-audio-input.wav
+*.wav
+*.mp4
