@@ -21,7 +21,7 @@ def main():
                 [data-testid="stToolbar"] {visibility: hidden !important;}
                 header {visibility: hidden !important;}
                 footer {visibility: hidden !important;}
-                [data-testid="stAppViewBlockContainer"] {margin: -5rem; !important;}
+                [data-testid="stAppViewBlockContainer"] {margin: -4.5rem; !important;}
                 </style>
                 """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)   
@@ -29,7 +29,7 @@ def main():
 
     # st.title('Video to Text')
     st.markdown("<h1 style='text-align: center; color: #a6e3a1;'>Video to Text</h1>", unsafe_allow_html=True)
-    st.markdown("<a href='https://github.com/sameemul-haque/Video-to-Text' style='color: #6c7086; font-size: 0.9rem; text-align: center; position: fixed; bottom: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'>Source Code</a>", unsafe_allow_html=True)
+    st.markdown("<a href='https://github.com/sameemul-haque/Video-to-Text' style='color: #6c7086; font-size: 0.9rem; text-align: center; position: fixed; top: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'><img style='width: 0.9rem; filter: brightness(0) saturate(100%) invert(47%) sepia(12%) saturate(640%) hue-rotate(193deg) brightness(91%) contrast(86%); margin-top: -0.15rem' src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'/> Source Code</a>", unsafe_allow_html=True)
 
     uploaded_file = st.file_uploader("Upload a video file here", type=["mp4"])
 
