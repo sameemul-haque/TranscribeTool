@@ -15,14 +15,20 @@ def main():
     st.set_page_config(
         page_title="Video to Text",
         page_icon="favicon.png",
-        menu_items={
-            'About': 'Source code is available at [GitHub](https://github.com/sameemul-haque/Video-to-Text)'
-        }
     )   
+    hide_streamlit_style = """
+                <style>
+                [data-testid="stToolbar"] {visibility: hidden !important;}
+                header {visibility: hidden !important;}
+                footer {visibility: hidden !important;}
+                </style>
+                """
+    st.markdown(hide_streamlit_style, unsafe_allow_html=True)   
+    # st.link_button("Source Code - GitHub", "https://github.com/sameemul-haque/Video-to-Text")
 
     # st.title('Video to Text')
     st.markdown("<h1 style='text-align: center; color: #a6e3a1;'>Video to Text</h1>", unsafe_allow_html=True)
-
+    st.markdown("<a href='https://github.com/sameemul-haque/Video-to-Text' style='color: #6c7086; font-size: 0.9rem; text-align: center; position: fixed; bottom: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'>Source Code</a>", unsafe_allow_html=True)
 
     uploaded_file = st.file_uploader("Upload a video file here", type=["mp4"])
 
