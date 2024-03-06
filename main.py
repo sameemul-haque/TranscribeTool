@@ -21,6 +21,7 @@ def main():
                 [data-testid="stToolbar"] {visibility: hidden !important;}
                 header {visibility: hidden !important;}
                 footer {visibility: hidden !important;}
+                [data-testid="stAppViewBlockContainer"] {margin: -5rem; !important;}
                 </style>
                 """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)   
