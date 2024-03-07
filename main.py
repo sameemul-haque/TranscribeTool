@@ -75,9 +75,25 @@ def main():
 
     if (uploaded_file is not None and (uploaded_file.type.startswith('video/') or uploaded_file.type.startswith('audio/'))) or yturl:
         if uploaded_file:
+            st.markdown(
+            """
+            <style>
+            [data-testid="stTextInput"] {display: none !important;}
+            [data-testid="orSeperator"] {display: none !important;}
+            </style>
+            """
+            , unsafe_allow_html=True)
             with st.spinner('Extracting audio from the media file. Please wait...'):
                 extracted_audio = extract_audio(uploaded_file)
         if yturl:
+            st.markdown(
+            """
+            <style>
+            [data-testid="stFileUploader"] {display: none !important;}
+            [data-testid="orSeperator"] {display: none !important;}
+            </style>
+            """
+            , unsafe_allow_html=True)
             with st.spinner('Downloading audio from URL. Please wait...'):
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     try:
