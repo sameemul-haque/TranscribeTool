@@ -2,6 +2,9 @@
 
 This project is a simple tool that allows users to upload a video file and extract text from it. It utilizes [Streamlit](https://streamlit.io/) for the user interface and [ffmpeg](https://ffmpeg.org/) for audio extraction, and [Whisper](https://openai.com/research/whisper) library for speech recognition.
 
+- Report issues [here](https://github.com/sameemul-haque/Video-to-Text/issues/new?labels=bug&projects=&template=bug_report.md&title=%5Bbug%5D) 
+- Request features [here](https://github.com/sameemul-haque/Video-to-Text/issues/new?labels=enhancement&projects=&template=feature_request.md&title=%5Bfeat%5D)
+
 ## Usage
 
 1. Open https://video-to-text.streamlit.app/
@@ -48,3 +51,11 @@ This project uses the following libraries:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+<!-- 
+streamlit==1.31.1
+pyperclip==1.8.2 
+ffmpeg-python==0.2.0
+openai-whisper==20231117
+-->
