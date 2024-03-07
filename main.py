@@ -16,7 +16,7 @@ def extract_audio(input_file):
         
 def main():
     st.set_page_config(
-        page_title="Video to Text",
+        page_title="VideoTool",
         page_icon="favicon.png",
     )   
     hide_streamlit_style = """
@@ -29,8 +29,8 @@ def main():
                 """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)   
 
-    st.markdown("<h1 style='text-align: center; color: #a6e3a1;'>Video to Text</h1>", unsafe_allow_html=True)
-    st.markdown("<a href='https://github.com/sameemul-haque/Video-to-Text' style='color: #6c7086; font-size: 0.9rem; text-align: center; position: fixed; top: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'><img style='width: 0.9rem; filter: brightness(0) saturate(100%) invert(47%) sepia(12%) saturate(640%) hue-rotate(193deg) brightness(91%) contrast(86%); margin-top: -0.15rem' src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'/> Source Code</a>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #a6e3a1;'>VideoTool</h1>", unsafe_allow_html=True)
+    st.markdown("<a href='https://github.com/sameemul-haque/VideoTool' style='color: #6c7086; font-size: 0.9rem; text-align: center; position: fixed; top: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'><img style='width: 0.9rem; filter: brightness(0) saturate(100%) invert(47%) sepia(12%) saturate(640%) hue-rotate(193deg) brightness(91%) contrast(86%); margin-top: -0.15rem' src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'/> Source Code</a>", unsafe_allow_html=True)
 
     uploaded_file = st.file_uploader("Upload a video or audio file here")
 
