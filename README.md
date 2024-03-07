@@ -1,16 +1,16 @@
-# Video to Text Converter
+# VideoTool
 
-This project is a simple tool that allows users to upload a video file and extract text from it. It utilizes [Streamlit](https://streamlit.io/) for the user interface and [ffmpeg](https://ffmpeg.org/) for audio extraction, and [Whisper](https://openai.com/research/whisper) library for speech recognition.
+This project is a simple tool that allows users to upload a video or audio file and extract text from it. It utilizes [Streamlit](https://streamlit.io/) for the user interface and [ffmpeg](https://ffmpeg.org/) for audio extraction, and [Whisper](https://openai.com/research/whisper) library for speech recognition.
 
-- Report issues [here](https://github.com/sameemul-haque/Video-to-Text/issues/new?labels=bug&projects=&template=bug_report.md&title=%5Bbug%5D) 
-- Request features [here](https://github.com/sameemul-haque/Video-to-Text/issues/new?labels=enhancement&projects=&template=feature_request.md&title=%5Bfeat%5D)
+- Report issues [here](https://github.com/sameemul-haque/VideoTool/issues/new?labels=bug&projects=&template=bug_report.md&title=%5Bbug%5D) 
+- Request features [here](https://github.com/sameemul-haque/VideoTool/issues/new?labels=enhancement&projects=&template=feature_request.md&title=%5Bfeat%5D)
 
 ## Usage
 
-1. Open https://video-to-text.streamlit.app/
-2. Upload a video file.
+1. Open https://videotool.streamlit.app/
+2. Upload a video or audio file.
 3. Wait for the transcription process to complete.
-4. View the full text extracted from the video and its segmented text.
+4. View the full text extracted from the file and its segmented text.
 
 
 ## Installation
@@ -36,9 +36,9 @@ streamlit run main.py
 ```
 
 6. Open your web browser and go to the URL provided by Streamlit.
-7. Upload a video file using the file uploader.
+7. Upload a video or audio file using the file uploader.
 8. Wait for the transcription process to complete.
-9. View the full text extracted from the video and its segmented text.
+9. View the full text extracted from the file and its segmented text.
 
 ## Acknowledgements
 
