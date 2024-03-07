@@ -113,6 +113,7 @@ def main():
             [data-testid="stFileUploader"] {display: none !important;}
             [data-testid="stTextInput"] {display: none !important;}
             [data-testid="orSeperator"] {display: none !important;}
+            [id="videotool"] {margin-bottom: -5rem !important;}
             </style>
             """
             , unsafe_allow_html=True)
