@@ -2,6 +2,7 @@ import ffmpeg
 import whisper
 import streamlit as st
 import os
+import yt_dlp
 
 def extract_audio(input_file):
     input_file_name = os.path.splitext(input_file.name)[0]
@@ -30,26 +31,105 @@ def main():
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)   
 
     st.markdown("<h1 style='text-align: center; color: #a6e3a1;'>VideoTool</h1>", unsafe_allow_html=True)
-    st.markdown("<a href='https://github.com/sameemul-haque/VideoTool' style='color: #6c7086; font-size: 0.9rem; text-align: center; position: fixed; top: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'><img style='width: 0.9rem; filter: brightness(0) saturate(100%) invert(47%) sepia(12%) saturate(640%) hue-rotate(193deg) brightness(91%) contrast(86%); margin-top: -0.15rem' src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'/> Source Code</a>", unsafe_allow_html=True)
+    st.markdown("<a href='https://github.com/sameemul-haque/VideoTool' style='color: #6c7086; font-size: 1rem; text-align: center; position: fixed; top: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'><img style='display: flex; justify-content: center; align-items: center; width: 1rem; filter: brightness(0) saturate(100%) invert(47%) sepia(12%) saturate(640%) hue-rotate(193deg) brightness(91%) contrast(86%);' src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'/></a>", unsafe_allow_html=True)
 
     uploaded_file = st.file_uploader("Upload a video or audio file here")
+    st.markdown(
+    """
+    <style>
+    .separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #6c7086;
+    }
 
-    if uploaded_file is not None and (uploaded_file.type.startswith('video/') or uploaded_file.type.startswith('audio/')):
-        with st.spinner('Retrieving the text from the media file. Please wait...'):
-            extracted_audio = extract_audio(uploaded_file)
+    .separator::before,
+    .separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px dotted #6c7086;
+    }
+
+    .separator:not(:empty)::before {
+    margin-right: .25em;
+    }
+
+    .separator:not(:empty)::after {
+    margin-left: .25em;
+    }
+    </style>
+    <div class="separator" data-testid="orSeperator">OR</div>
+    """, 
+    unsafe_allow_html=True)
+    yturl = st.text_input("Type the URL of a video here")
+
+    ydl_opts = {
+        'format': 'm4a/bestaudio/best',        
+        'postprocessors': [{ 
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'm4a',
+        }]
+    }
+
+
+    if (uploaded_file is not None and (uploaded_file.type.startswith('video/') or uploaded_file.type.startswith('audio/'))) or yturl:
+        if uploaded_file:
+            st.markdown(
+            """
+            <style>
+            [data-testid="stTextInput"] {display: none !important;}
+            [data-testid="orSeperator"] {display: none !important;}
+            </style>
+            """
+            , unsafe_allow_html=True)
+            with st.spinner('Extracting audio from the media file. Please wait...'):
+                extracted_audio = extract_audio(uploaded_file)
+        if yturl:
+            st.markdown(
+            """
+            <style>
+            [data-testid="stFileUploader"] {display: none !important;}
+            [data-testid="orSeperator"] {display: none !important;}
+            </style>
+            """
+            , unsafe_allow_html=True)
+            with st.spinner('Downloading audio from URL. Please wait...'):
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    try:
+                        info_dict = ydl.extract_info(yturl, download=False)
+                        ydl.download([yturl])
+                        audio_file_path = ydl.prepare_filename(info_dict)[:-3] + "m4a"
+                    except Exception as e:
+                        st.error("An error occurred: " + "  \n  " + f"{e}")
+                extracted_audio = audio_file_path
+
+        with st.spinner('Retrieving the text from the file. Please wait...'):
             model = whisper.load_model("base.en")
-            result = model.transcribe(extracted_audio)
-        st.markdown("***")
-        st.subheader("Full text from the media file")
+            result = model.transcribe(extracted_audio, fp16=False )
+            st.markdown(
+            """
+            <style>
+            [data-testid="stFileUploader"] {display: none !important;}
+            [data-testid="stTextInput"] {display: none !important;}
+            [data-testid="orSeperator"] {display: none !important;}
+            [id="videotool"] {margin-bottom: -5rem !important;}
+            </style>
+            """
+            , unsafe_allow_html=True)
+        st.subheader("Full text from the file")
         st.code(result["text"], language='None')
         st.markdown("***")
-        st.subheader("Segments of text from the media file")
+        st.subheader("Segments of text")
         for segment in result["segments"]:
             st.code(segment["text"], language='None')
         st.markdown("***")
+        if os.path.exists(extracted_audio):
+            os.remove(extracted_audio)
     else:
         if uploaded_file is not None:
             st.error("The file type is not supported")
+
 
 if __name__ == "__main__":
     main()
