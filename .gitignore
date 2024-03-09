@@ -6,3 +6,7 @@ venv
 
 *.wav
 *.mp4
+*.m4a
+*.flac
+
+test.py

@@ -1,15 +1,26 @@
-import ffmpeg
-import whisper
 import streamlit as st
+import requests
+from dotenv import load_dotenv
 import os
+import ffmpeg
+from tempfile import NamedTemporaryFile
 
-def extract_audio(input_video):
-    input_video_name = os.path.splitext(input_video.name)[0]
-    extracted_audio = f"audio-{input_video_name}.wav"
-    stream = ffmpeg.input("pipe:0")
-    stream = ffmpeg.output(stream, extracted_audio)
-    ffmpeg.run(stream, input=input_video.read(), overwrite_output=True)
-    return extracted_audio
+def process_file(input_file):
+    output_file_name = f"{input_file}_processed.flac"
+    ffmpeg.input(input_file).output(output_file_name, acodec='flac').run(overwrite_output=True)
+    return output_file_name
+
+def query(filename):
+    API_URL = "https://api-inference.huggingface.co/models/openai/whisper-base.en"
+    # locally
+    # HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+    # cloud
+    HUGGINGFACEHUB_API_TOKEN = st.secrets["HUGGINGFACEHUB_API_TOKEN"]
+    headers = {"Authorization": f"Bearer {HUGGINGFACEHUB_API_TOKEN}"}
+    with open(filename, "rb") as f:
+        data = f.read()
+    response = requests.post(API_URL, headers=headers, data=data)
+    return response.json()['text']
 
 def main():
     st.set_page_config(
@@ -25,27 +36,35 @@ def main():
                 </style>
                 """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)   
-    # st.link_button("Source Code - GitHub", "https://github.com/sameemul-haque/Video-to-Text")
+    load_dotenv()
+    st.markdown("<h1 style='text-align: center; color: #a6e3a1;'>VideoTool</h1>", unsafe_allow_html=True)
+    st.markdown("<a href='https://github.com/sameemul-haque/VideoTool' style='color: #6c7086; font-size: 1rem; text-align: center; position: fixed; top: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'><img style='display: flex; justify-content: center; align-items: center; width: 1rem; filter: brightness(0) saturate(100%) invert(47%) sepia(12%) saturate(640%) hue-rotate(193deg) brightness(91%) contrast(86%);' src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'/></a>", unsafe_allow_html=True)
 
-    # st.title('Video to Text')
-    st.markdown("<h1 style='text-align: center; color: #a6e3a1;'>Video to Text</h1>", unsafe_allow_html=True)
-    st.markdown("<a href='https://github.com/sameemul-haque/Video-to-Text' style='color: #6c7086; font-size: 0.9rem; text-align: center; position: fixed; top: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'><img style='width: 0.9rem; filter: brightness(0) saturate(100%) invert(47%) sepia(12%) saturate(640%) hue-rotate(193deg) brightness(91%) contrast(86%); margin-top: -0.15rem' src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'/> Source Code</a>", unsafe_allow_html=True)
+    uploaded_file = st.file_uploader("Upload a video file here")
 
-    uploaded_file = st.file_uploader("Upload a video file here", type=["mp4"])
-
-    if uploaded_file is not None:
-        with st.spinner('Retreiving the text from the video. Please wait...'):
-            extracted_audio = extract_audio(uploaded_file)
-            model = whisper.load_model("base.en")
-            result = model.transcribe(extracted_audio)
+    if uploaded_file is not None and (uploaded_file.type.startswith('video/') or uploaded_file.type.startswith('audio/')):
+        with st.spinner('Retrieving the text from the video. Please wait...'):
+            with NamedTemporaryFile() as temp:
+                temp.write(uploaded_file.getvalue())
+                temp.seek(0)
+                processed_file = process_file(temp.name)
+                output = query(f"{processed_file}")
+            st.markdown(
+            """
+            <style>
+            [data-testid="stFileUploader"] {margin-bottom: -2.5rem !important;}
+            </style>
+            """
+            , unsafe_allow_html=True)
         st.markdown("***")
-        st.subheader("Full text from the video")
-        st.code(result["text"], language='None')
+        st.write(output)
+        st.code(output, language="None")
         st.markdown("***")
-        st.subheader("Segments of text from the video")
-        for segment in result["segments"]:
-            st.code(segment["text"], language='None')
-        st.markdown("***")
+        os.remove(processed_file)
+        
+    else:
+        if uploaded_file is not None:
+            st.error("The file type is not supported")
 
 if __name__ == "__main__":
     main()
