@@ -3,17 +3,22 @@ import whisper
 import streamlit as st
 import os
 import yt_dlp
+from tempfile import NamedTemporaryFile
 
 def extract_audio(input_file):
-    input_file_name = os.path.splitext(input_file.name)[0]
+    with NamedTemporaryFile(delete=False) as temp_file:
+        temp_file.write(input_file.read())
+        temp_file_path = temp_file.name
+
+    input_file_name = os.path.splitext(temp_file_path)[0]
     if input_file.type.startswith('video/'):
         extracted_audio = f"audio-{input_file_name}.wav"
-        stream = ffmpeg.input("pipe:0")
+        stream = ffmpeg.input(temp_file_path)
         stream = ffmpeg.output(stream, extracted_audio)
-        ffmpeg.run(stream, input=input_file.read(), overwrite_output=True)
+        ffmpeg.run(stream, overwrite_output=True)
         return extracted_audio
     elif input_file.type.startswith('audio/'):
-        return input_file.name  
+        return temp_file_path
         
 def main():
     st.set_page_config(
@@ -62,7 +67,7 @@ def main():
     <div class="separator" data-testid="orSeperator">OR</div>
     """, 
     unsafe_allow_html=True)
-    yturl = st.text_input("Type the URL of a video here")
+    yturl = st.text_input("Type the URL of a youtube video here")
 
     ydl_opts = {
         'format': 'm4a/bestaudio/best',        
