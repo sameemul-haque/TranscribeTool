@@ -14,9 +14,9 @@ def process_file(input_file):
 def query(filename):
     API_URL = "https://api-inference.huggingface.co/models/openai/whisper-base.en"
     # locally
-    HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+    # HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
     # cloud
-    # HUGGINGFACEHUB_API_TOKEN = st.secrets["HUGGINGFACEHUB_API_TOKEN"]
+    HUGGINGFACEHUB_API_TOKEN = st.secrets["HUGGINGFACEHUB_API_TOKEN"]
     headers = {"Authorization": f"Bearer {HUGGINGFACEHUB_API_TOKEN}"}
     with open(filename, "rb") as f:
         data = f.read()
