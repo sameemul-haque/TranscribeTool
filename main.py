@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 import ffmpeg
 from tempfile import NamedTemporaryFile
+import yt_dlp
 
 def process_file(input_file):
     output_file_name = f"{input_file}_processed.flac"
@@ -23,8 +24,7 @@ def query(filename):
     if response.ok:
         return response.json()["text"]
     else:
-        st.markdown("<p style='margin-top: 5rem;'>Report issues <a href='https://github.com/sameemul-haque/TranscribeTool/issues/new?labels=bug&projects=&template=bug_report.md&title=%5Bbug%5D'>here</a> or <a href='mailto:connectinchat@gmail.com?subject=[BUG] TranscribeTool&body=<explain your issue here>'>here</a>.</p>", unsafe_allow_html=True)
-        return response.json()
+        None
 
 def main():
     st.set_page_config(
@@ -46,25 +46,83 @@ def main():
 
     uploaded_file = st.file_uploader("Upload a video file here")
 
-    if uploaded_file is not None and (uploaded_file.type.startswith('video/') or uploaded_file.type.startswith('audio/')):
-        with st.spinner('Retrieving the text from the video. Please wait...'):
-            with NamedTemporaryFile() as temp:
-                temp.write(uploaded_file.getvalue())
-                temp.seek(0)
-                processed_file = process_file(temp.name)
-                output = query(f"{processed_file}")
+    st.markdown(
+    """
+    <style>
+    .separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #6c7086;
+    }
+
+    .separator::before,
+    .separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px dotted #6c7086;
+    }
+
+    .separator:not(:empty)::before {
+    margin-right: .25em;
+    }
+
+    .separator:not(:empty)::after {
+    margin-left: .25em;
+    }
+    </style>
+    <div class="separator" data-testid="orSeperator">OR</div>
+    """, 
+    unsafe_allow_html=True)
+
+    yturl = st.text_input("Type the URL of a youtube video here")
+    ydl_opts = {
+        'format': 'm4a/bestaudio/best',        
+        'postprocessors': [{ 
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'm4a',
+        }]
+    }
+    if (uploaded_file is not None and (uploaded_file.type.startswith('video/') or uploaded_file.type.startswith('audio/'))) or yturl:
+        if uploaded_file:
+            with st.spinner('Retrieving the text from the video. Please wait...'):
+                with NamedTemporaryFile() as temp:
+                    temp.write(uploaded_file.getvalue())
+                    temp.seek(0)
+                    processed_file = process_file(temp.name)
+                    output = query(f"{processed_file}")
+                st.markdown(
+                """
+                <style>
+                [data-testid="stFileUploader"] {margin-bottom: -2.5rem !important;}
+                </style>
+                """
+                , unsafe_allow_html=True)
+        if yturl:
             st.markdown(
             """
             <style>
-            [data-testid="stFileUploader"] {margin-bottom: -2.5rem !important;}
+            [data-testid="stFileUploader"] {display: none !important;}
+            [data-testid="orSeperator"] {display: none !important;}
             </style>
             """
             , unsafe_allow_html=True)
+            with st.spinner('Downloading audio from URL. Please wait...'):
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    try:
+                        info_dict = ydl.extract_info(yturl, download=False)
+                        ydl.download([yturl])
+                        audio_file_path = ydl.prepare_filename(info_dict)[:-3] + "m4a"
+                    except Exception as e:
+                        st.error("An error occurred: " + "  \n  " + f"{e}")
+                processed_file = audio_file_path
+                output = query(f"{processed_file}")
         st.markdown("***")
         st.write(output)
         st.code(output, language="None")
         st.markdown("***")
-        os.remove(processed_file)
+        if processed_file is not None:
+            os.remove(processed_file)
         
     else:
         if uploaded_file is not None:
