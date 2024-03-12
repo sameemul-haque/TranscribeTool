@@ -1,4 +1,5 @@
 ffmpeg-python
 streamlit
 python-dotenv
+yt-dlp
 temp
