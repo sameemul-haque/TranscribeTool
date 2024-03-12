@@ -13,7 +13,6 @@ This project is a simple tool that allows users to upload a video or audio file 
 3. Wait for the transcription process to complete.
 4. View the text extracted from the file.
 
-
 ## Installation
 
 To run this project locally, follow these steps:
@@ -41,6 +40,8 @@ streamlit run main.py
 8. Wait for the transcription process to complete.
 9. View the text extracted from the file.
 
+![preview](https://raw.githubusercontent.com/sameemul-haque/VideoTool/preview/preview.png "preview")
+
 ## Acknowledgements
 
 This project uses the following libraries:
@@ -50,6 +51,11 @@ This project uses the following libraries:
 - [Streamlit](https://github.com/streamlit/streamlit) for building the web application.
 - [Whisper](huggingface.co/openai/whisper-base.en) for speech recognition.
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp) for retrieving audio from a video url.
+
+## License
+
+This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+
 
 <!-- 
 streamlit==1.31.1

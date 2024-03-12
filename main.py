@@ -26,6 +26,16 @@ def query(filename):
     else:
         None
 
+    input_file_name = os.path.splitext(temp_file_path)[0]
+    if input_file.type.startswith('video/'):
+        extracted_audio = f"audio-{input_file_name}.wav"
+        stream = ffmpeg.input(temp_file_path)
+        stream = ffmpeg.output(stream, extracted_audio)
+        ffmpeg.run(stream, overwrite_output=True)
+        return extracted_audio
+    elif input_file.type.startswith('audio/'):
+        return temp_file_path
+        
 def main():
     st.set_page_config(
         page_title="TranscribeTool",
@@ -40,6 +50,7 @@ def main():
                 </style>
                 """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)   
+
     load_dotenv()
     st.markdown("<h1 style='text-align: center; color: #a6e3a1;'>TranscribeTool</h1>", unsafe_allow_html=True)
     st.markdown("<a href='https://github.com/sameemul-haque/TranscribeTool' style='color: #6c7086; font-size: 1rem; text-align: center; position: fixed; top: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'><img style='display: flex; justify-content: center; align-items: center; width: 1rem; filter: brightness(0) saturate(100%) invert(47%) sepia(12%) saturate(640%) hue-rotate(193deg) brightness(91%) contrast(86%);' src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'/></a>", unsafe_allow_html=True)
@@ -76,6 +87,7 @@ def main():
     unsafe_allow_html=True)
 
     yturl = st.text_input("Type the URL of a youtube video here")
+
     ydl_opts = {
         'format': 'm4a/bestaudio/best',        
         'postprocessors': [{ 
@@ -98,6 +110,7 @@ def main():
                 </style>
                 """
                 , unsafe_allow_html=True)
+
         if yturl:
             st.markdown(
             """
