@@ -1,9 +1,17 @@
-# VideoTool
+# TranscribeTool
 
-This project is a simple tool that allows users to upload a video or audio file and extract text from it. It utilizes [Streamlit](https://streamlit.io/) for the user interface and [ffmpeg](https://ffmpeg.org/) for audio extraction, [Whisper](https://openai.com/research/whisper) library for speech recognition, and [yt-dlp](https://github.com/yt-dlp/yt-dlp) for retrieving audio from a video url.
+This project is a simple tool that allows users to upload a video or audio file and extract text from it. It utilizes [Streamlit](https://streamlit.io/) for the user interface and [ffmpeg](https://ffmpeg.org/) for audio extraction, [Whisper](https://openai.com/research/whisper) API for speech recognition, and [yt-dlp](https://github.com/yt-dlp/yt-dlp) for retrieving audio from a video url.
 
-- Report issues [here](https://github.com/sameemul-haque/VideoTool/issues/new?labels=bug&projects=&template=bug_report.md&title=%5Bbug%5D) 
-- Request features [here](https://github.com/sameemul-haque/VideoTool/issues/new?labels=enhancement&projects=&template=feature_request.md&title=%5Bfeat%5D)
+
+- Report issues [here](https://github.com/sameemul-haque/TranscribeTool/issues/new?labels=bug&projects=&template=bug_report.md&title=%5Bbug%5D) 
+- Request features [here](https://github.com/sameemul-haque/TranscribeTool/issues/new?labels=enhancement&projects=&template=feature_request.md&title=%5Bfeat%5D)
+
+## Usage
+
+1. Open https://transcribetool.streamlit.app/
+2. Upload a video | audio file or provide url of a youtube video.
+3. Wait for the transcription process to complete.
+4. View the text extracted from the file.
 
 ## Installation
 
@@ -30,7 +38,7 @@ streamlit run main.py
 6. Open your web browser and go to the URL provided by Streamlit.
 7. Upload a video | audio file or provide url of a video.
 8. Wait for the transcription process to complete.
-9. View the full text extracted from the file and its segmented text.
+9. View the text extracted from the file.
 
 ![preview](https://raw.githubusercontent.com/sameemul-haque/VideoTool/preview/preview.png "preview")
 
@@ -38,9 +46,10 @@ streamlit run main.py
 
 This project uses the following libraries:
 
+
 - [ffmpeg-python](https://github.com/kkroening/ffmpeg-python) for audio extraction.
 - [Streamlit](https://github.com/streamlit/streamlit) for building the web application.
-- [Whisper](https://github.com/openai/whisper) for speech recognition.
+- [Whisper](https://huggingface.co/openai/whisper-base.en) for speech recognition.
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp) for retrieving audio from a video url.
 
 ## License
@@ -52,5 +61,7 @@ This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) 
 streamlit==1.31.1
 ffmpeg-python==0.2.0
 openai-whisper==20231117
-yt-dlp==2023.12.30
+yt-dlp==2024.3.10
+python-dotenv==1.0.1
+temp==2020.7.2
 -->

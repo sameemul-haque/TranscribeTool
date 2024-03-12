@@ -1,28 +1,35 @@
-import ffmpeg
-import whisper
 import streamlit as st
+import requests
+from dotenv import load_dotenv
 import os
-import yt_dlp
+import ffmpeg
 from tempfile import NamedTemporaryFile
+import yt_dlp
 
-def extract_audio(input_file):
-    with NamedTemporaryFile(delete=False) as temp_file:
-        temp_file.write(input_file.read())
-        temp_file_path = temp_file.name
+def process_file(input_file):
+    output_file_name = f"{input_file}_processed.flac"
+    ffmpeg.input(input_file).output(output_file_name, acodec='flac').run(overwrite_output=True)
+    return output_file_name
 
-    input_file_name = os.path.splitext(temp_file_path)[0]
-    if input_file.type.startswith('video/'):
-        extracted_audio = f"audio-{input_file_name}.wav"
-        stream = ffmpeg.input(temp_file_path)
-        stream = ffmpeg.output(stream, extracted_audio)
-        ffmpeg.run(stream, overwrite_output=True)
-        return extracted_audio
-    elif input_file.type.startswith('audio/'):
-        return temp_file_path
-        
+def query(filename):
+    API_URL = "https://api-inference.huggingface.co/models/openai/whisper-base.en"
+    # locally
+    # HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+    # cloud
+    HUGGINGFACEHUB_API_TOKEN = st.secrets["HUGGINGFACEHUB_API_TOKEN"]
+    headers = {"Authorization": f"Bearer {HUGGINGFACEHUB_API_TOKEN}"}
+    with open(filename, "rb") as f:
+        data = f.read()
+    response = requests.post(API_URL, headers=headers, data=data)
+    if response.ok:
+        return response.json()["text"]
+    else:
+        st.markdown("<p style='margin-top: 5rem;'>Report issues <a href='https://github.com/sameemul-haque/TranscribeTool/issues/new?labels=bug&projects=&template=bug_report.md&title=%5Bbug%5D'>here</a> or <a href='mailto:connectinchat@gmail.com?subject=[BUG] TranscribeTool&body=<explain your issue here>'>here</a>.</p>", unsafe_allow_html=True)
+        return response.json()
+
 def main():
     st.set_page_config(
-        page_title="VideoTool",
+        page_title="TranscribeTool",
         page_icon="favicon.png",
     )   
     hide_streamlit_style = """
@@ -34,11 +41,12 @@ def main():
                 </style>
                 """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)   
+    load_dotenv()
+    st.markdown("<h1 style='text-align: center; color: #a6e3a1;'>TranscribeTool</h1>", unsafe_allow_html=True)
+    st.markdown("<a href='https://github.com/sameemul-haque/TranscribeTool' style='color: #6c7086; font-size: 1rem; text-align: center; position: fixed; top: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'><img style='display: flex; justify-content: center; align-items: center; width: 1rem; filter: brightness(0) saturate(100%) invert(47%) sepia(12%) saturate(640%) hue-rotate(193deg) brightness(91%) contrast(86%);' src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'/></a>", unsafe_allow_html=True)
 
-    st.markdown("<h1 style='text-align: center; color: #a6e3a1;'>VideoTool</h1>", unsafe_allow_html=True)
-    st.markdown("<a href='https://github.com/sameemul-haque/VideoTool' style='color: #6c7086; font-size: 1rem; text-align: center; position: fixed; top: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'><img style='display: flex; justify-content: center; align-items: center; width: 1rem; filter: brightness(0) saturate(100%) invert(47%) sepia(12%) saturate(640%) hue-rotate(193deg) brightness(91%) contrast(86%);' src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'/></a>", unsafe_allow_html=True)
+    uploaded_file = st.file_uploader("Upload a video file here")
 
-    uploaded_file = st.file_uploader("Upload a video or audio file here")
     st.markdown(
     """
     <style>
@@ -67,8 +75,8 @@ def main():
     <div class="separator" data-testid="orSeperator">OR</div>
     """, 
     unsafe_allow_html=True)
-    yturl = st.text_input("Type the URL of a youtube video here")
 
+    yturl = st.text_input("Type the URL of a youtube video here")
     ydl_opts = {
         'format': 'm4a/bestaudio/best',        
         'postprocessors': [{ 
@@ -76,8 +84,6 @@ def main():
             'preferredcodec': 'm4a',
         }]
     }
-
-
     if (uploaded_file is not None and (uploaded_file.type.startswith('video/') or uploaded_file.type.startswith('audio/'))) or yturl:
         if uploaded_file:
             st.markdown(
@@ -88,8 +94,22 @@ def main():
             </style>
             """
             , unsafe_allow_html=True)
-            with st.spinner('Extracting audio from the media file. Please wait...'):
-                extracted_audio = extract_audio(uploaded_file)
+            with st.spinner('Retrieving the text from the video. Please wait...'):
+                with NamedTemporaryFile() as temp:
+                    temp.write(uploaded_file.getvalue())
+                    temp.seek(0)
+                    processed_file = process_file(temp.name)
+                    output = query(f"{processed_file}")
+                st.markdown(
+                """
+                <style>
+                [data-testid="stFileUploader"] {display: none !important;}
+                [data-testid="stTextInput"] {display: none !important;}
+                [data-testid="orSeperator"] {display: none !important;}
+                [id="videotool"] {margin-bottom: -5rem !important;}
+                </style>
+                """
+                , unsafe_allow_html=True)
         if yturl:
             st.markdown(
             """
@@ -107,34 +127,28 @@ def main():
                         audio_file_path = ydl.prepare_filename(info_dict)[:-3] + "m4a"
                     except Exception as e:
                         st.error("An error occurred: " + "  \n  " + f"{e}")
-                extracted_audio = audio_file_path
-
-        with st.spinner('Retrieving the text from the file. Please wait...'):
-            model = whisper.load_model("base.en")
-            result = model.transcribe(extracted_audio, fp16=False )
-            st.markdown(
-            """
-            <style>
-            [data-testid="stFileUploader"] {display: none !important;}
-            [data-testid="stTextInput"] {display: none !important;}
-            [data-testid="orSeperator"] {display: none !important;}
-            [id="videotool"] {margin-bottom: -5rem !important;}
-            </style>
-            """
-            , unsafe_allow_html=True)
-        st.subheader("Full text from the file")
-        st.code(result["text"], language='None')
+                processed_file = audio_file_path
+                output = query(f"{processed_file}")
+                st.markdown(
+                """
+                <style>
+                [data-testid="stFileUploader"] {display: none !important;}
+                [data-testid="stTextInput"] {display: none !important;}
+                [data-testid="orSeperator"] {display: none !important;}
+                [id="videotool"] {margin-bottom: -5rem !important;}
+                </style>
+                """
+                , unsafe_allow_html=True)
         st.markdown("***")
-        st.subheader("Segments of text")
-        for segment in result["segments"]:
-            st.code(segment["text"], language='None')
+        st.write(output)
+        st.code(output, language="None")
         st.markdown("***")
-        if os.path.exists(extracted_audio):
-            os.remove(extracted_audio)
+        if processed_file is not None:
+            os.remove(processed_file)
+        
     else:
         if uploaded_file is not None:
             st.error("The file type is not supported")
-
 
 if __name__ == "__main__":
     main()
