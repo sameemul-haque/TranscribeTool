@@ -1,16 +1,17 @@
-# VideoTool
+# TranscribeTool
 
-This project is a simple tool that allows users to upload a video file and extract text from it. It utilizes [Streamlit](https://streamlit.io/) for the user interface and [Whisper](https://openai.com/research/whisper) library for transcription recognition.
+This project is a simple tool that allows users to upload a video or audio file and extract text from it. It utilizes [Streamlit](https://streamlit.io/) for the user interface and [ffmpeg](https://ffmpeg.org/) for audio extraction, [Whisper](https://openai.com/research/whisper) API for speech recognition, and [yt-dlp](https://github.com/yt-dlp/yt-dlp) for retrieving audio from a video url.
 
-- Report issues [here](https://github.com/sameemul-haque/Video-to-Text/issues/new?labels=bug&projects=&template=bug_report.md&title=%5Bbug%5D) 
-- Request features [here](https://github.com/sameemul-haque/Video-to-Text/issues/new?labels=enhancement&projects=&template=feature_request.md&title=%5Bfeat%5D)
+
+- Report issues [here](https://github.com/sameemul-haque/TranscribeTool/issues/new?labels=bug&projects=&template=bug_report.md&title=%5Bbug%5D) 
+- Request features [here](https://github.com/sameemul-haque/TranscribeTool/issues/new?labels=enhancement&projects=&template=feature_request.md&title=%5Bfeat%5D)
 
 ## Usage
 
-1. Open https://videotool.streamlit.app/
-2. Upload a video | audio file.
+1. Open https://transcribetool.streamlit.app/
+2. Upload a video | audio file or provide url of a youtube video.
 3. Wait for the transcription process to complete.
-4. View the full text extracted from the video and its segmented text.
+4. View the text extracted from the file.
 
 
 ## Installation
@@ -36,20 +37,25 @@ streamlit run main.py
 ```
 
 6. Open your web browser and go to the URL provided by Streamlit.
-7. Upload a video | audio  file using the file uploader.
+7. Upload a video | audio file or provide url of a video.
 8. Wait for the transcription process to complete.
-9. View the full text extracted from the video and its segmented text.
+9. View the text extracted from the file.
 
 ## Acknowledgements
 
 This project uses the following libraries:
 
+
+- [ffmpeg-python](https://github.com/kkroening/ffmpeg-python) for audio extraction.
 - [Streamlit](https://github.com/streamlit/streamlit) for building the web application.
-- [Whisper](https://github.com/openai/whisper) for speech recognition.
-- [ffmpeg](https://ffmpeg.org/)
+- [Whisper](huggingface.co/openai/whisper-base.en) for speech recognition.
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) for retrieving audio from a video url.
 
 <!-- 
 streamlit==1.31.1
 ffmpeg-python==0.2.0
 openai-whisper==20231117
+yt-dlp==2024.3.10
+python-dotenv==1.0.1
+temp==2020.7.2
 -->
