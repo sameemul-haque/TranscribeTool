@@ -21,8 +21,10 @@ def query(filename):
     with open(filename, "rb") as f:
         data = f.read()
     response = requests.post(API_URL, headers=headers, data=data)
-    if response.ok:
+    if response.status_code == 200 :
         return response.json()["text"]
+    if response.status_code == 503:
+        st.error("The model is currently loading. Please try again in a few minutes.")
     else:
         st.markdown("<p style='margin-top: 5rem;'>Report issues <a href='https://github.com/sameemul-haque/TranscribeTool/issues/new?labels=bug&projects=&template=bug_report.md&title=%5Bbug%5D'>here</a> or <a href='mailto:connectinchat@gmail.com?subject=[BUG] TranscribeTool&body=<explain your issue here>'>here</a>.</p>", unsafe_allow_html=True)
         return response.json()
@@ -45,7 +47,7 @@ def main():
     st.markdown("<h1 style='text-align: center; color: #a6e3a1;'>TranscribeTool</h1>", unsafe_allow_html=True)
     st.markdown("<a href='https://github.com/sameemul-haque/TranscribeTool' style='color: #6c7086; font-size: 1rem; text-align: center; position: fixed; top: 0; left: 0; text-decoration: none; border: solid 1px #6c7086; border-radius: 10px; padding: 0.5rem; margin: 1rem;'><img style='display: flex; justify-content: center; align-items: center; width: 1rem; filter: brightness(0) saturate(100%) invert(47%) sepia(12%) saturate(640%) hue-rotate(193deg) brightness(91%) contrast(86%);' src='https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'/></a>", unsafe_allow_html=True)
 
-    uploaded_file = st.file_uploader("Upload a video file here")
+    uploaded_file = st.file_uploader("Upload a video | audio file here")
 
     st.markdown(
     """
@@ -100,16 +102,6 @@ def main():
                     temp.seek(0)
                     processed_file = process_file(temp.name)
                     output = query(f"{processed_file}")
-                st.markdown(
-                """
-                <style>
-                [data-testid="stFileUploader"] {display: none !important;}
-                [data-testid="stTextInput"] {display: none !important;}
-                [data-testid="orSeperator"] {display: none !important;}
-                [id="videotool"] {margin-bottom: -5rem !important;}
-                </style>
-                """
-                , unsafe_allow_html=True)
         if yturl:
             st.markdown(
             """
@@ -129,16 +121,17 @@ def main():
                         st.error("An error occurred: " + "  \n  " + f"{e}")
                 processed_file = audio_file_path
                 output = query(f"{processed_file}")
-                st.markdown(
-                """
-                <style>
-                [data-testid="stFileUploader"] {display: none !important;}
-                [data-testid="stTextInput"] {display: none !important;}
-                [data-testid="orSeperator"] {display: none !important;}
-                [id="videotool"] {margin-bottom: -5rem !important;}
-                </style>
-                """
-                , unsafe_allow_html=True)
+        
+        st.markdown(
+        """
+        <style>
+        [data-testid="stFileUploader"] {display: none !important;}
+        [data-testid="stTextInput"] {display: none !important;}
+        [data-testid="orSeperator"] {display: none !important;}
+        [id="transcribetool"] {margin-bottom: -5rem !important;}
+        </style>
+        """
+        , unsafe_allow_html=True)
         st.markdown("***")
         st.write(output)
         st.code(output, language="None")
